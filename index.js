@@ -262,6 +262,23 @@ client.on('interactionCreate', async interaction => {
   }
 });
 
+client.on('guildMemberRemove', async member => {
+  console.log(`Member left: ${member.user.tag}`);
+  const roleIdsToCheck = ['1270705578351788156', '1270705630185001010', '1270761393427185694']; 
+  const hasRole = member.roles.cache.some(role => roleIdsToCheck.includes(role.id));
+
+  console.log(`Has specific role: ${hasRole}`);
+
+  if (hasRole) {
+      const logChannel = member.guild.channels.cache.get(config.logchannelid); 
+      if (logChannel) {
+          logChannel.send(`⚠️ **${member.user.tag}** (${member.id}) with specific roles has left the server.`);
+      } else {
+          console.log('Log channel not found.');
+      }
+  }
+});
+
 
 client.login(config.token);
 

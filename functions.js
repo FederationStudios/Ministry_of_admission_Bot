@@ -670,6 +670,7 @@ const getFriendsCount = async function(userId) {
 
 
 
+
 module.exports = {
   fetchUserInformationFromUsernames,
   toConsole,

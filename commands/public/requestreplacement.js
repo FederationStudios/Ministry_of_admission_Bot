@@ -78,10 +78,12 @@ module.exports = {
                     new ButtonBuilder()
                         .setCustomId('claim')
                         .setLabel('Claim')
+                        .setEmoji("✅")
                         .setStyle(ButtonStyle.Success),
                     new ButtonBuilder()
                         .setCustomId('deny')
                         .setLabel('Deny')
+                        .setEmoji("💣")
                         .setStyle(ButtonStyle.Danger),
                 );
 
