@@ -1,6 +1,6 @@
 const { Client, GatewayIntentBits, InteractionType, ActivityType, Collection, EmbedBuilder } = require("discord.js");
 const { ApplicationCommandOptionType } = require("discord-api-types/v10");
-const { interactionEmbed, toConsole } = require("./functions.js");
+const { interactionEmbed, toConsole, getRowifi } = require("./functions.js");
 const fs = require("node:fs");
 const noblox = require('noblox.js');
 const config = require("./config.json");
@@ -262,20 +262,37 @@ client.on('interactionCreate', async interaction => {
   }
 });
 
-client.on('guildMemberRemove', async member => {
-  console.log(`Member left: ${member.user.tag}`);
-  const roleIdsToCheck = ['1270705578351788156', '1270705630185001010', '1270761393427185694']; 
-  const hasRole = member.roles.cache.some(role => roleIdsToCheck.includes(role.id));
+client.on('guildMemberRemove', async (member) => {
+  console.log(`Member left: ${member.user.tag}`); // Debugging: Confirm member leave event
 
-  console.log(`Has specific role: ${hasRole}`);
+  const roleIdsToCheck = ['1270705578351788156', '1270705630185001010', '1270761393427185694']; // Replace with the specific role IDs
+  const hasRole = member.roles.cache.some(role => roleIdsToCheck.includes(role.id));
+  
+  console.log(`Has specific role: ${hasRole}`); // Debugging: Confirm role check
 
   if (hasRole) {
-      const logChannel = member.guild.channels.cache.get(config.logchannelid); 
-      if (logChannel) {
-          logChannel.send(`⚠️ **${member.user.tag}** (${member.id}) with specific roles has left the server.`);
-      } else {
-          console.log('Log channel not found.');
+      console.log('Member has specific role, checking RoWifi status...'); // Debugging
+
+      // Fetch Rowifi data for the member
+      const rowifiData = getRowifi(member.id, client);
+      
+      console.log(`RoWifi data: ${JSON.stringify(rowifiData)}`); // Debugging: Print Rowifi data
+
+      let robloxInfo = 'did not have linked with RoWifi';
+
+      if (rowifiData.success) {
+          robloxInfo = `has linked with RoWifi as ${rowifiData.username} (Roblox ID: ${rowifiData.roblox})`;
       }
+
+      // Send a message to the log channel
+      const logChannel = member.guild.channels.cache.get(config.logchannelid); // Replace with your log channel ID from config.json
+      if (logChannel) {
+          logChannel.send(`⚠️ **${member.user.tag}** (${member.id}) with specific roles has left the server and ${robloxInfo}.`);
+      } else {
+          console.error('Log channel not found.'); // Debugging: Confirm if log channel exists
+      }
+
+      console.log(`RoWifi status: ${robloxInfo}`); // Debugging
   }
 });
 
