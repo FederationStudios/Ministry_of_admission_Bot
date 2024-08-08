@@ -1,0 +1,20 @@
+{
+  "name": "ministry_of_admission_bot",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@discordjs/rest": "^2.3.0",
+    "discord-api-types": "^0.37.93",
+    "discord.js": "^14.15.3",
+    "mongoose": "^8.5.2",
+    "noblox.js": "^5.0.1",
+    "node-fetch": "^2.6.7"
+  }
+}
