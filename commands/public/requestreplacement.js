@@ -1,3 +1,5 @@
+// eslint-disable no-undef
+// eslint-disable-next-line no-unused-vars
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, Client, CommandInteraction, CommandInteractionOptionResolver } = require('discord.js');
 const noblox = require('noblox.js'); // Ensure noblox.js is installed and required
 const { interactionEmbed, getRowifi } = require('../../functions');

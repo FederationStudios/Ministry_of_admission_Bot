@@ -1,3 +1,4 @@
+// eslint-disable no-undef
 // eslint-disable-next-line no-unused-vars
 const { Client, CommandInteraction, CommandInteractionOptionResolver, SlashCommandBuilder, EmbedBuilder } = require("discord.js");
 const { interactionEmbed } = require("../../functions.js");

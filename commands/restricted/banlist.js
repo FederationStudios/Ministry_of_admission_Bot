@@ -1,5 +1,6 @@
-// eslint-disable-next-line no-unused-vars
-const { Client, CommandInteraction, SlashCommandBuilder } = require("discord.js");
+ 
+// eslint-disable no-undef
+const { CommandInteraction, SlashCommandBuilder } = require("discord.js");
 const { paginationEmbed, getRowifi, interactionEmbed } = require("../../functions.js");
 const { requiredRoles } = require("../../config.json");
 
@@ -10,10 +11,9 @@ module.exports = {
     .setName("banlist")
     .setDescription("Fetch the list of banned users and check their RoWifi status."),
   /**
-   * @param {Client} client
    * @param {CommandInteraction} interaction
    */
-  async run(client, interaction) {
+  async run(interaction) {
     try {
       await interaction.deferReply();
 

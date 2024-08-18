@@ -1,4 +1,6 @@
 /* eslint-disable no-unused-vars */
+// eslint-disable no-undef
+ 
 const { Client, EmbedBuilder, Interaction, ActionRow, ButtonComponent, SelectMenuComponent, SelectMenuInteraction, SelectMenuOptionBuilder, ComponentType, ActionRowBuilder, ButtonStyle, ButtonBuilder, User } = require("discord.js");
 const { default: fetch } = require("node-fetch");
 const config = require("./config.json");

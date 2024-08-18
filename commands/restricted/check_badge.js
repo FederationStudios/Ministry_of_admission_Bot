@@ -1,5 +1,7 @@
+// eslint-disable no-undef
+ 
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { EmbedBuilder, Client, CommandInteraction, CommandInteractionOptionResolver } = require('discord.js');
+const { EmbedBuilder, Client, CommandInteraction } = require('discord.js');
 const noblox = require('noblox.js');
 const { requiredRoles } = require("../../config.json");
 
@@ -20,9 +22,8 @@ module.exports = {
     /**
      * @param {Client} client
      * @param {CommandInteraction} interaction
-     * @param {CommandInteractionOptionResolver} options
      */           
-    run: async(client, interaction, options) => {
+    run: async(client, interaction) => {
         await interaction.deferReply({ephemeral: false});
 
         const hasRole = requiredRoles.some(roleId => interaction.member.roles.cache.has(roleId));

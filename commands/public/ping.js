@@ -1,5 +1,6 @@
-/* eslint-disable no-undef */
-const { SlashCommandBuilder } = require('discord.js');
+// eslint-disable no-undef
+// eslint-disable-next-line no-unused-vars
+const { SlashCommandBuilder, Client, CommandInteraction } = require('discord.js');
 
 module.exports = {
     name: 'ping',
