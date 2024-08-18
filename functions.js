@@ -221,6 +221,72 @@ const errors = {
     await message.edit({ content: content, components: [] });
     return res;
   };
+
+  /**
+ * Fetches Roblox user data by username or user ID.
+ * @async
+ * @param {string | number} input - Roblox username or user ID.
+ * @returns {Promise<{ success: boolean, error?: string, user?: object }>} - The result of the fetch operation.
+ */
+async function getRoblox(input) {
+  if (!isNaN(Number(input))) {
+    // If input is a number, fetch the user from Roblox API
+    const resp = await fetch(`https://users.roblox.com/v1/users/${input}`);
+    const user = await resp.json().catch(() => ({ errors: [] }));
+
+    // If the user is not found or rate limited, return an error
+    if (resp.status === 429) {
+      return {
+        success: false,
+        error: "Ratelimited by Roblox. Try again later or visit the user's profile manually for their user ID"
+      };
+    }
+    if (user.errors) {
+      return { success: false, error: `Interpreted ${input} as user ID but found no user` };
+    }
+    // Return the user
+    return { success: true, user };
+  } else {
+    const resp = await fetch('https://users.roblox.com/v1/usernames/users', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ usernames: [input] })
+    });
+    const user = await resp
+      .json()
+      .then(r => r.data[0])
+      .catch(() => null);
+
+    // If the user is not found or rate limited, return an error
+    if (resp.status === 429) {
+      return {
+        success: false,
+        error: "Ratelimited by Roblox. Try again later or visit the user's profile manually for their user ID"
+      };
+    }
+    if (!user) {
+      return { success: false, error: `Interpreted ${input} as username but found no user` };
+    }
+    // Return the user
+    return { success: true, user };
+  }
+};
+
+/**
+ * Gets the key of an enum object by its value.
+ * @param {object} enumObj - The enum object.
+ * @param {number} value - The value to look up.
+ * @returns {string | undefined} - The key corresponding to the value.
+ */
+function getEnumKey(enumObj, value) {
+  for (const key in enumObj) {
+    if (Object.prototype.hasOwnProperty.call(enumObj, key) && enumObj[key] === value) {
+      return key;
+    }
+  }
+  return undefined;
+};
+
   /**
    * @async
    * @param {string} username Roblox username
@@ -679,6 +745,8 @@ module.exports = {
   awaitMenu,
   getRowifi,
   getGroup,
+  getRoblox,
+  getEnumKey,
   paginationEmbed,
   paginationResponses,
   parseTime,

@@ -1,6 +1,4 @@
-
-// eslint-disable-next-line no-unused-vars
-const {SlashCommandBuilder, Client, CommandInteraction, CommandInteractionOptionResolver, EmbedBuilder, Colors} = require("discord.js");
+const { SlashCommandBuilder, Client, CommandInteraction, CommandInteractionOptionResolver, EmbedBuilder, Colors } = require("discord.js");
 const { getRowifi } = require("../../functions");
 const nbx = require("noblox.js");
 const config = require("../../config.json");
@@ -11,16 +9,16 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName("rowificheck")
     .setDescription("Gives you back the rowifi details")
-    .addStringOption(option => {
+    .addUserOption(option => {
       return option
-        .setName("id")
-        .setDescription("Discord id")
+        .setName("user")
+        .setDescription("Select the user to check RoWifi details for")
         .setRequired(true);
     })
     .addBooleanOption(option => {
       return option  
         .setName("ephemeral")
-        .setDescription("Whether or not the echo should be ephemeral");
+        .setDescription("Whether or not the response should be ephemeral");
     }),
 
   /**
@@ -34,7 +32,8 @@ module.exports = {
         // Defer the reply as this might take time
         await interaction.deferReply({ ephemeral: true });
 
-        const id = interaction.options.getString("id");
+        const user = interaction.options.getUser("user");
+        const id = user.id; // Extract the Discord ID from the selected user
         const bol = interaction.options.getBoolean("ephemeral");
         const rowifi = await getRowifi(id, client);
 
@@ -53,10 +52,10 @@ module.exports = {
                 }
             ],
             footer: {
-                text: `⚠ FISA - Secure Transmission at ${new Date().toLocaleTimeString()} ${new Date().toString().match(/GMT([+-]\d{2})(\d{2})/)[0]}`,
+                text: `⚠ MoA - Secure Transmission at ${new Date().toLocaleTimeString()} ${new Date().toString().match(/GMT([+-]\d{2})(\d{2})/)[0]}`,
                 iconURL: client.user.displayAvatarURL()
             }
-        }).setColor(Colors.Aqua);
+        }).setColor(Colors.DarkNavy);
 
         if (!isNaN(rowifi.roblox)) {
             let info = await nbx.getPlayerInfo(rowifi.roblox);
@@ -73,5 +72,5 @@ module.exports = {
             await interaction.followUp({ content: "An error occurred while processing your request.", ephemeral: true });
         }
     }
-  }
+ }
 }

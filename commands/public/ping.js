@@ -19,6 +19,6 @@ module.exports = {
         await interaction.editReply({ content: 'Testing ping... [1/2]' });
         pings.push(Date.now()-now);
         pings.push(client.ws.shards.first().ping);
-        interaction.editReply({ content: `**Latency Test Complete**\n> WebSocket Latency: ${pings[0]}\n> API Latency: ${pings[1]}\n\nMaintanied by suman9725`});
+        interaction.editReply({ content: `**Latency Test Complete**\n> WebSocket Latency: ${pings[0]}\n> API Latency: ${pings[1]}\n\nCoded and Maintanied by suman9725`});
     }
 };

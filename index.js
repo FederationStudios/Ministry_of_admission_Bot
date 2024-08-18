@@ -219,7 +219,8 @@ client.on('interactionCreate', async interaction => {
 
       const dmEmbed = new EmbedBuilder()
           .setTitle('Waiting for image')
-          .setDescription(`Before you can claim this replacement request, you need to send an image of you ingame to verify your attendance. Upload the picture here or use a link from Lightshot, Gyazo, or Discord Media.`);
+          .setDescription(`Before you can claim this replacement request, you need to send an image of you ingame to verify your attendance. Upload the picture here or use a link from Lightshot, Gyazo, or Discord Media.`)
+          .setColor('Red');
 
       try {
           const dmChannel = await claimant.createDM();
