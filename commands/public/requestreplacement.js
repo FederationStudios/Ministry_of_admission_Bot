@@ -76,7 +76,7 @@ module.exports = {
             await interaction.editReply(`<@&1270705578351788156> is requesting for replacement! GET READY YAYAYA!!!!`)
             const replacementEmbed = new EmbedBuilder()
                 .setTitle('Replacement Request')
-                .setDescription(`**<@!${interaction.user.id}> is leaving the game at ${leaveTime} and needs a replacement.**`)
+                .setDescription(`**<@!${interaction.user.id}> is leaving the game at ${leaveTime} minutes and needs a replacement.**`)
                 .addFields(
                     { name: 'Username', value: username },
                     { name: 'Profile Link', value: `https://www.roblox.com/users/${rowifi.roblox}/profile` }
