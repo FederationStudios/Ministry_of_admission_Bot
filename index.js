@@ -5,10 +5,8 @@ const fs = require("node:fs");
 const noblox = require('noblox.js');
 const config = require("./config.json");
 const fetch = require('node-fetch');
-const mongoose = require('mongoose');
 let ready = false;
 const path = require("path");
-
 
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMembers, GatewayIntentBits.MessageContent, GatewayIntentBits.DirectMessages] });
@@ -21,67 +19,6 @@ client.once("ready", async () => {
   client.user.setActivity("All memebrs!", { type: ActivityType.Watching });
   //End of bot status
 
-  main().catch(err => console.log(err));
-  async function main() {
-    try {
-      await mongoose.connect(config.uri);
-      console.log("Database connection established!");
-    } catch (err) {
-      console.log("Failed to connect to database: " + err);
-    }
-  }
-// Ensure you are logged in to Roblox API
-// async function loginRoblox() {
-//   try {
-//       await noblox.setCookie(''); // Replace with your Roblox cookie
-//       console.log('Logged in to Roblox successfully.');
-//   } catch (error) {
-//       console.error('Error logging in to Roblox: ', error);
-//   }
-// }
-
-// Function to check if a user is in-game
-// async function isUserInGame(userId, robloxCookie) {
-//   try {
-//       const response = await fetch('https://presence.roblox.com/v1/presence/users', {
-//           method: 'POST',
-//           body: JSON.stringify({
-//               userIds: [userId]
-//           }),
-//           headers: {
-//               'Content-Type': 'application/json',
-//               'Cookie': `.ROBLOSECURITY=${robloxCookie}`
-//           }
-//       });
-
-//       const data = await response.json();
-//       const presenceCheck = data.errors || data.userPresences[0];
-
-//       if (Array.isArray(presenceCheck) || !presenceCheck) {
-//           console.error(`Presence check failed for user ${userId}\n`, JSON.stringify(presenceCheck, null, 2));
-//           return false; // Presence check failed
-//       }
-
-//       if (presenceCheck.userPresenceType !== 2) {
-//           console.log("User must be in-game in order to use this command.");
-//           return false; // User is not in-game
-//       }
-
-//       return true; // User is in-game
-//   } catch (error) {
-//       console.error('Error checking presence:', error);
-//       return false; // Error occurred
-//   }
-// }
-
-// Example usage
-// (async () => {
-//   const userId = 456105574; // Replace with actual user ID
-//   const robloxCookie = ''; // Replace with actual Roblox cookie
-
-//   const isInGame = await isUserInGame(userId, robloxCookie);
-//   console.log(`User ${userId} is in game: ${isInGame}`);
-// })();
 
   //Commands
   const loadCommands = (folderPath, type) => {
@@ -208,18 +145,76 @@ client.on("interactionCreate", async interaction => {
 //#endregion
 
 //#region DM handling
+const claimedRequests = new Map();
+// Roblox cookie from config
+const robloxCookie = config.robloxCookie;
+// Login function for Roblox
+async function loginRoblox() {
+    await noblox.setCookie(robloxCookie); 
+}
+// Function to check if a user is in-game
+async function isUserInGame(userId) {
+    try {
+        const presences = await fetch('https://presence.roblox.com/v1/presence/users', {
+            method: 'POST',
+            body: JSON.stringify({ userIds: [userId] }),
+            headers: {
+                'Content-Type': 'application/json',
+                Cookie: `.ROBLOSECURITY=${robloxCookie}`
+            }
+        }).then(res => res.json());
+        
+        const presence = presences.userPresences ? presences.userPresences[0] : null;
+        return presence && presence.userPresenceType === 2; // Check if the user is in-game
+    } catch (error) {
+        console.error('Error checking if user is in game: ', error);
+        return false;
+    }
+}
+
+// Log in to Roblox on bot startup
+loginRoblox().catch(console.error);
+
 client.on('interactionCreate', async interaction => {
   if (!interaction.isButton()) return;
 
+  const requestId = interaction.message.id;
+  const claimant = interaction.user;
+  const requesterId = interaction.message.interaction.user.id;
+
   if (interaction.customId === 'claim') {
-      const claimant = interaction.user;
+      // Prevent the user from claiming their own request
+      if (claimant.id === requesterId) {
+          return interaction.reply({ content: '**You cannot claim your own request.**', ephemeral: true });
+      }
+
+      // Check if the request has already been claimed
+      if (claimedRequests.has(requestId)) {
+          return interaction.reply({ content: 'This request has already been claimed.', ephemeral: true });
+      }
+
+      // Check if the user is in-game on Roblox
+      const rowifi = await getRowifi(claimant.id, client); // Assuming claimant.tag is the Roblox username
+      if (!rowifi.success) {
+        return interaction.reply({ content: 'You must be verified with rowifi lol!', ephemeral: true  });
+    }
+    const robloxId = rowifi.roblox;
+    console.log(rowifi.username);
+      const inGame = await isUserInGame(robloxId);
+
+      if (!inGame) {
+          return interaction.reply({ content: 'You must be in-game on Roblox to claim this request.', ephemeral: true });
+      }
+
+      // Mark this request as claimed by the user
+      claimedRequests.set(requestId, claimant.id);
 
       // Acknowledge the button press by updating the interaction message
       await interaction.update({ content: `Replacement claimed by ${claimant.tag}. Please check your DMs to verify your attendance.`, components: [] });
 
       const dmEmbed = new EmbedBuilder()
           .setTitle('Waiting for image')
-          .setDescription(`Before you can claim this replacement request, you need to send an image of you ingame to verify your attendance. Upload the picture here or use a link from Lightshot, Gyazo, or Discord Media.`)
+          .setDescription(`Before you can claim this replacement request, you need to send an image of you in-game to verify your attendance. Upload the picture here or use a link from Lightshot, Gyazo, or Discord Media.`)
           .setColor('Red');
 
       try {
@@ -239,8 +234,6 @@ client.on('interactionCreate', async interaction => {
                   }
 
                   // Confirm the replacement
-                  await interaction.followUp({ content: `Replacement confirmed. Claimed by ${claimant.tag}.`, components: [] }); // Follow-up message to avoid InteractionAlreadyReplied error
-
                   await dmChannel.send('Thank you! Your attendance has been verified.');
               } else {
                   await dmChannel.send('Invalid image or link. Please send a valid image or link.');
@@ -258,11 +251,22 @@ client.on('interactionCreate', async interaction => {
   }
 
   if (interaction.customId === 'deny') {
+      // Check if the person denying the request is the original requester
+      if (claimant.id !== requesterId) {
+          return interaction.reply({ content: 'You cannot deny this request. Only the original requester can deny it.', ephemeral: true });
+      }
+
       // Use interaction.update to remove buttons
-      await interaction.update({ content: 'Replacement request denied.', components: [] });
+      if (!interaction.replied && !interaction.deferred) {
+          await interaction.update({ content: 'Replacement request denied.', components: [] });
+      }
+
+      // Remove the claim status if it was claimed
+      claimedRequests.delete(requestId);
   }
 });
 
+//#region Leaving guild
 client.on('guildMemberRemove', async (member) => {
   console.log(`Member left: ${member.user.tag}`); // Debugging: Confirm member leave event
 
@@ -275,7 +279,7 @@ client.on('guildMemberRemove', async (member) => {
       console.log('Member has specific role, checking RoWifi status...'); // Debugging
 
       // Fetch Rowifi data for the member
-      const rowifiData = getRowifi(member.id, client);
+      const rowifiData = await getRowifi(member.id, client);
       
       console.log(`RoWifi data: ${JSON.stringify(rowifiData)}`); // Debugging: Print Rowifi data
 
@@ -286,7 +290,7 @@ client.on('guildMemberRemove', async (member) => {
       }
 
       // Send a message to the log channel
-      const logChannel = member.guild.channels.cache.get(config.logchannelid); // Replace with your log channel ID from config.json
+      const logChannel = member.guild.channels.cache.get(config.commandUsage); // Replace with your log channel ID from config.json
       if (logChannel) {
           logChannel.send(`⚠️ **${member.user.tag}** (${member.id}) with specific roles has left the server and ${robloxInfo}.`);
       } else {
@@ -332,9 +336,4 @@ process.on("exit", (code) => {
   console.error(`[EXIT] Code: ${code}`);
 
 });
-
-
-
-
-
 //#endregion

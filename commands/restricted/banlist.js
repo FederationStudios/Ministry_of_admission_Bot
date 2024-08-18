@@ -1,6 +1,7 @@
 // eslint-disable-next-line no-unused-vars
 const { Client, CommandInteraction, SlashCommandBuilder } = require("discord.js");
-const { paginationEmbed, getRowifi } = require("../../functions.js");
+const { paginationEmbed, getRowifi, interactionEmbed } = require("../../functions.js");
+const { requiredRoles } = require("../../config.json");
 
 module.exports = {
   name: "banlist",
@@ -15,6 +16,12 @@ module.exports = {
   async run(client, interaction) {
     try {
       await interaction.deferReply();
+
+      // Check if the user has appropriate permissions 
+      const hasRole = requiredRoles.some(roleId => interaction.member.roles.cache.has(roleId));
+      if (!hasRole) {
+        return interactionEmbed(3, "[ERR-UPRM]", `You do not have permission to run this command, buddy.`, interaction, client, [true, 30]);
+      }
 
       const banList = await interaction.guild.bans.fetch();
 

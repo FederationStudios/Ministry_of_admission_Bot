@@ -2,6 +2,8 @@
 const { Client, CommandInteraction, CommandInteractionOptionResolver, SlashCommandBuilder, EmbedBuilder } = require("discord.js");
 const { interactionEmbed } = require("../../functions.js");
 const nbx = require("noblox.js");
+const { requiredRoles } = require("../../config.json");
+
 
 module.exports = {
   name: "profile",
@@ -23,8 +25,6 @@ module.exports = {
   run: async(client, interaction, options) => {
 
     await interaction.deferReply();
-
-    const requiredRoles = ['1162814026976337981', '1270761393427185694', '763820228333273138']; // Replace with the IDs of the required roles
 
     const hasRole = requiredRoles.some(roleId => interaction.member.roles.cache.has(roleId));
     if (!hasRole) {
