@@ -10,7 +10,13 @@ const robloxCookie = config.robloxCookie;
 
 // Login function for Roblox
 async function loginRoblox() {
+    try{
     await noblox.setCookie(robloxCookie); // Replace with your Roblox cookie
+    const currentUser = await noblox.getCurrentUser();
+        console.log(`Logged in as ${currentUser.UserName} (${currentUser.UserID})`);
+    } catch (error) {
+      console.error('Failed to log into Roblox:', error);
+    }
 }
 
 // Function to check if a user is in-game

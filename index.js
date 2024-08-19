@@ -10,6 +10,7 @@ const config = require("./config.json");
 const fetch = require('node-fetch');
 let ready = false;
 const path = require("path");
+const { roleIdsToCheck } = require('./config.json');
 
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMembers, GatewayIntentBits.MessageContent, GatewayIntentBits.DirectMessages] });
@@ -231,7 +232,7 @@ client.on('interactionCreate', async interaction => {
           collector.on('collect', async message => {
               if (message.attachments.size > 0 || message.content.match(/https?:\/\/\S+/)) {
                   // Send image to a specific channel
-                  const targetChannel = client.channels.cache.get('1270096374410514443'); // Replace with your channel ID
+                  const targetChannel = client.channels.cache.get(config.commandUsage); // Replace with your channel ID
                   if (targetChannel) {
                       await targetChannel.send({ content: `${claimant.tag} sent an image for verification:`, files: Array.from(message.attachments.values()) });
                   }
@@ -273,7 +274,6 @@ client.on('interactionCreate', async interaction => {
 client.on('guildMemberRemove', async (member) => {
   console.log(`Member left: ${member.user.tag}`); // Debugging: Confirm member leave event
 
-  const roleIdsToCheck = ['1270705578351788156', '1270705630185001010', '1270761393427185694']; // Replace with the specific role IDs
   const hasRole = member.roles.cache.some(role => roleIdsToCheck.includes(role.id));
   
   console.log(`Has specific role: ${hasRole}`); // Debugging: Confirm role check
@@ -293,7 +293,7 @@ client.on('guildMemberRemove', async (member) => {
       }
 
       // Send a message to the log channel
-      const logChannel = member.guild.channels.cache.get(config.commandUsage); // Replace with your log channel ID from config.json
+      const logChannel = member.guild.channels.cache.get(config.leaveChannelLog); 
       if (logChannel) {
           logChannel.send(`⚠️ **${member.user.tag}** (${member.id}) with specific roles has left the server and ${robloxInfo}.`);
       } else {
