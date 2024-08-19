@@ -2,7 +2,7 @@
 // eslint-disable-next-line no-unused-vars
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, Client, CommandInteraction, CommandInteractionOptionResolver } = require('discord.js');
 const noblox = require('noblox.js'); // Ensure noblox.js is installed and required
-const { interactionEmbed, getRowifi } = require('../../functions');
+const { getRowifi } = require('../../functions');
 const config = require('../../config.json')
 
 // Roblox cookie from config
@@ -75,7 +75,7 @@ module.exports = {
                 return interaction.editReply({ content: `**<@!${interaction.user.id}> must be in-game to request a replacement.**`, ephemeral: true });
             }
 
-            await interaction.editReply(`<@&1270705578351788156> is requesting for replacement! GET READY YAYAYA!!!!`)
+            await interaction.editReply(`<@&842719074780708914> is requesting for replacement! GET READY YAYAYA!!!!`)
             const replacementEmbed = new EmbedBuilder()
                 .setTitle('Replacement Request')
                 .setDescription(`**<@!${interaction.user.id}> is leaving the game at ${leaveTime} minutes and needs a replacement.**`)
