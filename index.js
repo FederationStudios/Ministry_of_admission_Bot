@@ -15,7 +15,7 @@ const { roleIdsToCheck } = require('./config.json');
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMembers, GatewayIntentBits.MessageContent, GatewayIntentBits.DirectMessages] });
 client.commands = new Collection();
-client.modals = new Collection();
+//client.modals = new Collection();
 
 //#region Events
 client.once("ready", async () => {
@@ -52,23 +52,23 @@ client.once("ready", async () => {
   const fisaCommands = loadCommands(path.join(__dirname, "commands", "restricted"), "STAFF");
 
   //Modals
-  const modals = fs.readdirSync("./modals").filter(file => file.endsWith(".js"));
-  console.info(`[MDL-LOAD] Loading modals, expecting ${modals.length} modals`);
-  for (let file of modals) {
-    try {
-      console.info(`[MDL-LOAD] Loading file ${file}`);
-      let modal = require(`./modals/${file}`);
+  // const modals = fs.readdirSync("./modals").filter(file => file.endsWith(".js"));
+  // console.info(`[MDL-LOAD] Loading modals, expecting ${modals.length} modals`);
+  // for (let file of modals) {
+  //   try {
+  //     console.info(`[MDL-LOAD] Loading file ${file}`);
+  //     let modal = require(`./modals/${file}`);
 
-      if (modal.name) {
-        console.info(`[MDL-LOAD] Loaded: ${file}`);
-        client.modals.set(modal.name, modal);
-      }
-    } catch (e) {
-      console.warn(`[MDL-LOAD] Unloaded: ${file}`);
-      console.warn(`[MDL-LOAD] ${e}`);
-    }
-  }
-  console.info("[MDL-LOAD] Loaded modals");
+  //     if (modal.name) {
+  //       console.info(`[MDL-LOAD] Loaded: ${file}`);
+  //       client.modals.set(modal.name, modal);
+  //     }
+  //   } catch (e) {
+  //     console.warn(`[MDL-LOAD] Unloaded: ${file}`);
+  //     console.warn(`[MDL-LOAD] ${e}`);
+  //   }
+  // }
+  // console.info("[MDL-LOAD] Loaded modals");
 
   await client.application.commands.set(globalCommands); //global commands (punishmentsubmission and backgroundcheckrequest)
 
@@ -123,18 +123,18 @@ client.on("interactionCreate", async interaction => {
     }
   }
   }
-  if (interaction.isModalSubmit()) {
-    // modals need to have the same name as the commands they are started with
-    const modalName = interaction.customId;
-    const modal = client.modals.get(modalName);
-    if (modal) {
-      modal.run(client, interaction, interaction.fields);
-    } else {
-      await interaction.reply("Modal not found.");
-      console.warn(`No modal found for: ${modalName}`);
-      toConsole(`No modal found for: ${modalName}`,new Error().stack,client);
-    }
-  }
+  // if (interaction.isModalSubmit()) {
+  //   // modals need to have the same name as the commands they are started with
+  //   const modalName = interaction.customId;
+  //   const modal = client.modals.get(modalName);
+  //   if (modal) {
+  //     modal.run(client, interaction, interaction.fields);
+  //   } else {
+  //     await interaction.reply("Modal not found.");
+  //     console.warn(`No modal found for: ${modalName}`);
+  //     toConsole(`No modal found for: ${modalName}`,new Error().stack,client);
+  //   }
+  // }
   if(interaction.isMessageContextMenuCommand())
   {
     const command = client.commands.get(interaction.commandName);
