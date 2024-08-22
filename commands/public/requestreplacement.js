@@ -41,6 +41,7 @@ async function isUserInGame(userId) {
 
 module.exports = {
     name: 'requestreplacement',
+    description: 'Request a replacement when leaving the game',
     data: new SlashCommandBuilder()
         .setName('requestreplacement')
         .setDescription('Request a replacement when leaving the game')

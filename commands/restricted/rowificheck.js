@@ -32,7 +32,7 @@ module.exports = {
   run: async (client, interaction) => {
     try {
         // Defer the reply as this might take time
-        await interaction.deferReply({ ephemeral: true });
+        await interaction.deferReply({ ephemeral: false });
         // Check if the user has appropriate permissions (CoA Leadership)
 
         const hasRole = requiredRoles.some(roleId => interaction.member.roles.cache.has(roleId));
