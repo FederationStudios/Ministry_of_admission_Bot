@@ -1,122 +1,132 @@
-const { EmbedBuilder, SlashCommandBuilder, CommandInteraction, Client, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { getRowifi } = require('../../functions');
-const noblox = require('noblox.js');
+const { Client, CommandInteraction, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder } = require("discord.js");
+const { getRowifi } = require("../../functions.js");
+const noblox = require("noblox.js");
+
+const claimedRequests = new Map();
 
 module.exports = {
-    name: 'request_oa_event',
-    description: 'Request an event with specific details.',
+    name: "supervision",
+    description: "Request supervision and provide your details.",
     data: new SlashCommandBuilder()
-        .setName('request_oa_event')
-        .setDescription('Request an event with specific details.')
-        .addIntegerOption(option =>
-            option.setName('time')
-                .setDescription('Time available for the event in hours')
-                .setRequired(true))
+        .setName('supervision')
+        .setDescription('Request supervision and provide your details.')
         .addStringOption(option =>
-            option.setName('event_type')
-                .setDescription('Select the type of event')
-                .addChoices(
-                    { name: 'OCG I', value: 'OCG I' },
-                    { name: 'OCG II', value: 'OCG II' },
-                    { name: 'OCG III', value: 'OCG III' },
-                    { name: 'Staff Events', value: 'Staff Events' },
-                )
-                .setRequired(true))
-        .addStringOption(option =>
-            option.setName('event')
-                .setDescription('Select event')
-                .addChoices(
-                    { name: 'Co-host', value: 'Co-host' },
-                    { name: 'Weapons Training', value: 'Weapons Training' },
-                    { name: 'Discipline Training', value: 'Discipline Training' },
-                    { name: 'Patrol Supervision', value: 'Patrol Supervision' },
-                    { name: 'Physical Training', value: 'Physical Training' },
-                    { name: 'Situational Discipline Training', value: 'Situational Discipline Training' },
-                    { name: 'Situational Moderation Training', value: 'Situational Moderation Training' },
-                    { name: 'UT Evaluation', value: 'UT Evaluation' },
-                    { name: 'Essentials Lecture Pt.1', value: 'Essentials Lecture Pt.1' },
-                    { name: 'Essentials Lecture Pt.2', value: 'Essentials Lecture Pt.2' },
-                    { name: 'Knowledge Exam', value: 'Knowledge Exam' },
-                )
+            option.setName('duration')
+                .setDescription('Type in whole number and in hours, others are not allowed.')
                 .setRequired(true)),
-
     /**
      * @param {Client} client
      * @param {CommandInteraction} interaction
-     */
+     */            
     run: async (client, interaction) => {
-        await interaction.deferReply({ ephemeral: true });
-
-        const time = interaction.options.getInteger('time');
-        const eventDetails = interaction.options.getString('event');
-        const id = interaction.user.id;
-        const rowifi = await getRowifi(id, client);
-
-        if (!rowifi.success) {
-            return interaction.editReply({ content: 'You need to be verified with RoWifi to continue.' });
-        }
-
-        const username = rowifi.username;
-        let currentRankOA;
         try {
-            currentRankOA = await noblox.getRankNameInGroup(10436572, rowifi.roblox); // OA group
-        } catch (error) {
-            return interaction.editReply({ content: 'Failed to fetch current rank. Please try again later.', ephemeral: true });
-        }
+            // Defer the reply to give more time for processing
+            await interaction.deferReply({ ephemeral: false });
 
-        const embed = new EmbedBuilder()
-            .setColor('Purple')
-            .setTitle('Event Request')
-            .setDescription(
-                `**Username:** <@!${interaction.user.id}> (${username})\n` +
-                `**Rank:** ${currentRankOA || 'N/A'}\n` +
-                `**Event Requested:** ${eventDetails}\n` +
-                `**Time Available:** ${time}h`
-            )
-            .setFooter({ text: `Requested by ${interaction.member.user.username}`, iconURL: interaction.user.displayAvatarURL() })
-            .setTimestamp();
+            const duration = interaction.options.getString("duration");
+            const id = interaction.user.id;
 
-        const acceptButton = new ButtonBuilder()
-            .setCustomId('accept')
-            .setLabel('Accept')
-            .setStyle(ButtonStyle.Success);
+            const rowifi = await getRowifi(id, client);
 
-        const denyButton = new ButtonBuilder()
-            .setCustomId('deny')
-            .setLabel('Deny')
-            .setStyle(ButtonStyle.Danger);
-
-        const row = new ActionRowBuilder().addComponents(acceptButton, denyButton);
-
-        const targetChannelId = '1265982268162183178'; // Replace with your channel ID
-        const targetChannel = await interaction.client.channels.fetch(targetChannelId);
-
-        const message = await targetChannel.send({ content: '<@&842716052881801217> and <@&842717207528079410>, a new event is up for grabs! Let\'s get to it.', embeds: [embed], components: [row] });
-        
-        const filter = i => ['accept', 'deny'].includes(i.customId);
-
-        const collector = message.createMessageComponentCollector({ filter, time: 60000 });
-
-        collector.on('collect', async i => {
-            if (i.customId === 'accept') {
-                const allowedRoles = ['842716052881801217', '842717207528079410']; // Replace with the actual role IDs
-                const hasPermission = i.member.roles.cache.some(role => allowedRoles.includes(role.id));
-                if (!hasPermission) {
-                    return i.reply({ content: 'You do not have permission to accept this event.', ephemeral: true });
-                }
-                await i.update({ content: `Event has been accepted by ${i.user.username}.`, components: [] });
-            } else if (i.customId === 'deny') {
-                if (i.user.id !== id) {
-                    return i.reply({ content: 'You do not have permission to deny this event.', ephemeral: true });
-                }
-                await i.update({ content: 'The event request has been denied.', components: [] });
+            if (!rowifi.success) {
+                return interaction.editReply({ content: 'You need to be verified with RoWifi to continue.' });
             }
-        });
 
-        collector.on('end', async () => {
-            await message.edit({ components: [] }); // Remove buttons after the collector ends
-        });
+            const robloxUsername = rowifi.username;
+            const admissionRank = await noblox.getRankNameInGroup(3052496, rowifi.roblox);
 
-        await interaction.editReply({ content: 'Your event request has been submitted.', ephemeral: true });
+            const embed = new EmbedBuilder()
+                .setTitle("Supervision Request")
+                .addFields(
+                    { name: "Username", value: robloxUsername, inline: true },
+                    { name: "Rank", value: admissionRank, inline: false },
+                    { name: "Duration of Availability", value: `${duration} hours`, inline: false },
+                    { name: "Profile Link", value: `https://www.roblox.com/users/${rowifi.roblox}/profile`, inline: false }
+                )
+                .setFooter({
+                    text: `Requested by ${interaction.user.tag}`,
+                    iconURL: interaction.user.displayAvatarURL({ dynamic: true })
+                })
+                .setTimestamp()
+                .setColor("Aqua");
+
+            const claimButton = new ButtonBuilder()
+                .setCustomId('claim')
+                .setLabel('Claim')
+                .setEmoji("✅")
+                .setStyle(ButtonStyle.Success);
+
+            const denyButton = new ButtonBuilder()
+                .setCustomId('deny')
+                .setLabel('Deny')
+                .setEmoji("💣")
+                .setStyle(ButtonStyle.Danger);
+
+            const row = new ActionRowBuilder().addComponents(claimButton, denyButton);
+
+            const message = await interaction.editReply({
+                content: "<@&842716052881801217> <@&842717207528079410>",
+                embeds: [embed],
+                components: [row],
+                fetchReply: true
+            });
+
+            const requestId = message.id;
+
+            const filter = i => i.customId === 'claim' || i.customId === 'deny';
+
+            // Convert duration from hours to milliseconds
+            const durationInHours = parseInt(duration, 10);  // Ensure it is an integer
+            const durationInMilliseconds = durationInHours * 60 * 60 * 1000;  // Convert to milliseconds
+
+            const collector = interaction.channel.createMessageComponentCollector({ filter, time: durationInMilliseconds });
+
+            collector.on('collect', async i => {
+                const claimant = i.user;
+
+                if (i.customId === 'claim') {
+                    if (claimant.id === id) {
+                        return i.reply({ content: '**You cannot claim your own request.**', ephemeral: true });
+                    }
+
+                    if (claimedRequests.has(requestId)) {
+                        return i.reply({ content: 'This request has already been claimed.', ephemeral: true });
+                    }
+
+                    const rowifiClaimant = await getRowifi(claimant.id, client);
+
+                    if (!rowifiClaimant.success) {
+                        return i.reply({ content: 'You must be verified with RoWifi to claim this request.', ephemeral: true });
+                    }
+
+                    claimedRequests.set(requestId, claimant.id);
+
+                    await i.update({ content: `Supervision claimed by ${claimant.tag}. Please check your DMs.`, components: [] });
+
+                } else if (i.customId === 'deny') {
+                    if (claimant.id !== id) {
+                        return i.reply({ content: 'You cannot deny this request. Only the original requester can deny it.', ephemeral: true });
+                    }
+
+                    if (!i.replied && !i.deferred) {
+                        await i.update({ content: 'Supervision request denied.', components: [] });
+                    }
+
+                    claimedRequests.delete(requestId);
+                }
+            });
+
+            collector.on('end', async collected => {
+                if (collected.size === 0 && !claimedRequests.has(requestId)) {
+                    await interaction.editReply({ content: 'No one claimed the supervision request in time.', components: [] });
+                }
+            });
+
+        } catch (error) {
+            console.error(error);
+            if (!interaction.replied) {
+                await interaction.reply({ content: 'An error occurred while processing your request.', ephemeral: true });
+            }
+        }
     }
 };
