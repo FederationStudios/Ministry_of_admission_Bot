@@ -5,7 +5,6 @@ const { Client, GatewayIntentBits, InteractionType, ActivityType, Collection, Em
 const { ApplicationCommandOptionType } = require("discord-api-types/v10");
 const { interactionEmbed, toConsole, getRowifi } = require("./functions.js");
 const fs = require("node:fs");
-const noblox = require('noblox.js');
 const config = require("./config.json");
 const fetch = require('node-fetch');
 let ready = false;
@@ -150,34 +149,7 @@ client.on("interactionCreate", async interaction => {
 
 //#region DM handling
 const claimedRequests = new Map();
-// Roblox cookie from config
-const robloxCookie = config.robloxCookie;
-// Login function for Roblox
-async function loginRoblox() {
-    await noblox.setCookie(robloxCookie); 
-}
-// Function to check if a user is in-game
-async function isUserInGame(userId) {
-    try {
-        const presences = await fetch('https://presence.roblox.com/v1/presence/users', {
-            method: 'POST',
-            body: JSON.stringify({ userIds: [userId] }),
-            headers: {
-                'Content-Type': 'application/json',
-                Cookie: `.ROBLOSECURITY=${robloxCookie}`
-            }
-        }).then(res => res.json());
-        
-        const presence = presences.userPresences ? presences.userPresences[0] : null;
-        return presence && presence.userPresenceType === 2; // Check if the user is in-game
-    } catch (error) {
-        console.error('Error checking if user is in game: ', error);
-        return false;
-    }
-}
 
-// Log in to Roblox on bot startup
-loginRoblox().catch(console.error);
 
 client.on('interactionCreate', async interaction => {
   if (!interaction.isButton()) return;
@@ -203,12 +175,6 @@ client.on('interactionCreate', async interaction => {
         return interaction.reply({ content: 'You must be verified with rowifi lol!', ephemeral: true  });
     }
     const robloxId = rowifi.roblox;
-    console.log(rowifi.username);
-      const inGame = await isUserInGame(robloxId);
-
-      if (!inGame) {
-          return interaction.reply({ content: 'You must be in-game on Roblox to claim this request.', ephemeral: true });
-      }
 
       // Mark this request as claimed by the user
       claimedRequests.set(requestId, claimant.id);

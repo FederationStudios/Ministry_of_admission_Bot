@@ -5,39 +5,6 @@ const noblox = require('noblox.js'); // Ensure noblox.js is installed and requir
 const { getRowifi } = require('../../functions');
 const config = require('../../config.json')
 
-// Roblox cookie from config
-const robloxCookie = config.robloxCookie;
-
-// Login function for Roblox
-async function loginRoblox() {
-    try{
-    await noblox.setCookie(robloxCookie); // Replace with your Roblox cookie
-    const currentUser = await noblox.getCurrentUser();
-        console.log(`Logged in as ${currentUser.UserName} (${currentUser.UserID})`);
-    } catch (error) {
-      console.error('Failed to log into Roblox:', error);
-    }
-}
-
-// Function to check if a user is in-game
-async function isUserInGame(userId) {
-    try {
-        const presences = await fetch('https://presence.roblox.com/v1/presence/users', {
-            method: 'POST',
-            body: JSON.stringify({ userIds: [userId] }),
-            headers: {
-                'Content-Type': 'application/json',
-                Cookie: `.ROBLOSECURITY=${robloxCookie}`
-            }
-        }).then(res => res.json());
-        
-        const presence = presences.userPresences ? presences.userPresences[0] : null;
-        return presence && presence.userPresenceType === 2; // Check if the user is in-game
-    } catch (error) {
-        console.error('Error checking if user is in game: ', error);
-        return false;
-    }
-}
 
 module.exports = {
     name: 'requestreplacement',
@@ -59,9 +26,7 @@ module.exports = {
         const leaveTime = interaction.options.getString('time');
 
         try {
-            // Login to Roblox API
-            await loginRoblox();
-
+            
             // Get user ID from username
             const id = interaction.user.id;
  
@@ -77,11 +42,7 @@ module.exports = {
          
           console.log(rowifi.roblox);
             // Check if the user is in-game
-            const isInGame = await isUserInGame(rowifi.roblox);
-            if (!isInGame) {
-                return interaction.editReply({ content: `**<@!${interaction.user.id}> must be in-game to request a replacement.**`, ephemeral: true });
-            }
-
+    
             await interaction.editReply(`<@&842719074780708914> is requesting for replacement! GET READY YAYAYA!!!!`)
             const replacementEmbed = new EmbedBuilder()
                 .setTitle('Replacement Request')

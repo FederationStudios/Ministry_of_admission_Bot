@@ -101,7 +101,7 @@ module.exports = {
 
                     claimedRequests.set(requestId, claimant.id);
 
-                    await i.update({ content: `Supervision claimed by ${claimant.tag}. Please check your DMs.`, components: [] });
+                    await i.update({ content: `Supervision claimed by <@&${claimant.id}>. Please check your DMs.`, components: [] });
 
                 } else if (i.customId === 'deny') {
                     if (claimant.id !== id) {
