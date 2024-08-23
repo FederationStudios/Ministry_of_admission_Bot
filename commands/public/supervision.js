@@ -63,8 +63,9 @@ module.exports = {
                 .setStyle(ButtonStyle.Danger);
 
             const row = new ActionRowBuilder().addComponents(claimButton, denyButton);
-            await interaction.editReply(`<@&842716052881801217> <@&842717207528079410>, Let's get them.`)
+            const content = `<@&842716052881801217> and <@&842717207528079410> | Submitted at <t:${Math.floor(Date.now()/1000)}:T>`;
             const message = await interaction.editReply({
+                content: content,
                 embeds: [embed],
                 components: [row],
                 fetchReply: true
