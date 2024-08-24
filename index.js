@@ -1,12 +1,8 @@
-// eslint-disable no-undef
- 
-
 const { Client, GatewayIntentBits, InteractionType, ActivityType, Collection, EmbedBuilder } = require("discord.js");
 const { ApplicationCommandOptionType } = require("discord-api-types/v10");
 const { interactionEmbed, toConsole, getRowifi } = require("./functions.js");
 const fs = require("node:fs");
 const config = require("./config.json");
-const fetch = require('node-fetch');
 let ready = false;
 const path = require("path");
 const { roleIdsToCheck } = require('./config.json');
@@ -174,7 +170,8 @@ client.on('interactionCreate', async interaction => {
       if (!rowifi.success) {
         return interaction.reply({ content: 'You must be verified with rowifi lol!', ephemeral: true  });
     }
-    const robloxId = rowifi.roblox;
+  
+    const robloxId = rowifi.roblox; // eslint-disable-line no-unused-vars
 
       // Mark this request as claimed by the user
       claimedRequests.set(requestId, claimant.id);
@@ -189,7 +186,8 @@ client.on('interactionCreate', async interaction => {
 
       try {
           const dmChannel = await claimant.createDM();
-          const dmMessage = await dmChannel.send({ embeds: [dmEmbed] });
+           
+          const dmMessage = await dmChannel.send({ embeds: [dmEmbed] }); // eslint-disable-line no-unused-vars
 
           // Define the filter for message collection
           const filter = message => message.author.id === claimant.id;

@@ -1,10 +1,10 @@
 // eslint-disable no-undef
- 
+// eslint-disable no-unused-vars
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { EmbedBuilder, Client, CommandInteraction } = require('discord.js');
+const { EmbedBuilder, Client, CommandInteraction } = require('discord.js'); // eslint-disable-line no-unused-vars
 const noblox = require('noblox.js');
 const { requiredRoles } = require("../../config.json");
-
+const { interactionEmbed } = require('../../functions');
 module.exports = {
     name: 'check_badge',
     description: 'Check if a player has a specific badge',

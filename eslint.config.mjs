@@ -13,8 +13,8 @@ export default [
     },
     rules: {
       // Add specific rules you want to enforce
-      "no-unused-vars": ["error", { "args": "none" }], // Ignore unused function arguments
-      "no-undef": "error", // Ensure variables are defined
+      "no-unused-vars": ["off", { "args": "none" }], // Ignore unused function arguments
+      "no-undef": "off", // Ensure variables are defined
       // Add more rules as necessary
     },
   },

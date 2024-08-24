@@ -1,4 +1,4 @@
-const { Client, CommandInteraction, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder } = require("discord.js");
+const { Client, CommandInteraction, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder } = require("discord.js"); // eslint-disable-line no-unused-vars
 const { getRowifi } = require("../../functions.js");
 const noblox = require("noblox.js");
 

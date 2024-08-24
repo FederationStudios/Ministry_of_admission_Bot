@@ -3,7 +3,6 @@
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, Client, CommandInteraction, CommandInteractionOptionResolver } = require('discord.js');
 const noblox = require('noblox.js'); // Ensure noblox.js is installed and required
 const { getRowifi } = require('../../functions');
-const config = require('../../config.json')
 
 
 module.exports = {

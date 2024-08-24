@@ -27,14 +27,14 @@ module.exports = {
 
     try {
       robloxid = await nbx.getIdFromUsername(robloxuser);
-    } catch (error) {
+    } catch (error) { // eslint-disable-line no-unused-vars
       return interactionEmbed(3, "[ERR-ARGS]", `Interpreted \`${robloxuser}\` as username but found no user`, interaction, client, [true, 15]);
     }
 
     let groups;
     try {
       groups = await nbx.getGroups(robloxid);
-    } catch (error) {
+    } catch (error) { // eslint-disable-line no-unused-vars
       return interactionEmbed(3, "[ERR-FETCH]", `Failed to fetch groups for **${robloxuser}**. Please try again later.`, interaction, client, [true, 15]);
     }
 
